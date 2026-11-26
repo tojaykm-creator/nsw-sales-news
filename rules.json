@@ -76,6 +76,18 @@
    "",
    "Background for customer meetings.",
    "고객 미팅 참고 자료"
+  ],
+  [
+   "korea",
+   "Korean Companies",
+   "한국기업",
+   [
+    "Australia (Samsung OR LG OR SK OR Hyundai OR Kia OR POSCO OR Hanwha)",
+    "Australia (Lotte OR CJ OR Doosan OR \"Korea Zinc\" OR \"Korean Air\" OR \"Korean company\")"
+   ],
+   "",
+   "Check the impact on Korean customers and possible follow-up.",
+   "한국계 기업 동향. 후속 영업 기회 확인"
   ]
  ],
  "stages": [
@@ -136,5 +148,8 @@
  "topic": "warehous|distribution (cent|hub)|logistics|freight|supply chain|port (botany|kembla|of (newcastle|sydney))|shipping|cargo|intermodal|customs|biosecurity|border force|tariffs?\\b|\\bimports?\\b|\\bexports?\\b|\\b3PL\\b|fulfil|heavy vehicle|truck(ing| driver)|industrial (estate|park|land|precinct)|e-?commerce",
  "place": "\\bAustralia|\\bAussie|\\bNSW\\b|New South Wales|Sydney|Newcastle|Wollongong|Port Botany|Port Kembla|Moorebank|Eastern Creek|Kemps Creek|Bradfield|Badgerys Creek|Aerotropolis|Erskine Park|Marsden Park|Yennora|Melbourne|Brisbane|Perth|Adelaide|Darwin|Hobart|Canberra|Geelong|Victoria|Queensland|Western Australia|South Australia|Tasmania|Northern Territory|Fremantle",
  "foreign": "\\b(China|Chinese|India|Indian|US|U\\.S\\.|America|UK|Britain|Europe|EU|Africa|Botswana|Cambodia|Thailand|Vietnam|T[uü]rkiye|Turkey|Pakistan|Nigeria|Kenya|Philippines|Indonesia|Malaysia|Japan|Korea|Canada|Mexico|Russia|Ukraine|Iran|Saudi|Dubai|Bangladesh|Sri Lanka|New Zealand)\\b",
- "brands": "Chemist Warehouse|(The )?Warehouse (Project|Group)|Sneaker Warehouse|Dan Murphy'?s"
+ "brands": "Chemist Warehouse|(The )?Warehouse (Project|Group)|Sneaker Warehouse|Dan Murphy'?s",
+ "korea_names": "\\b(Samsung|LG|SK|Hyundai|Kia|POSCO|Posco|Hanwha|Lotte|CJ|Doosan|Korea Zinc|Korean Air|KOGAS|Kogas|Korea Gas|Korean|South Korea'?n?)\\b",
+ "korea_biz": "invest|\\bdeals?\\b|contract|\\borders?\\b|awarded|\\bwins?\\b|\\bwon\\b|tender|supply|supplier|\\bplant\\b|factory|facility|manufactur|construction|\\bbuild|project|logistics|freight|shipping|warehous|\\bport\\b|acquir|acquisition|partnership|joint venture|\\bMOU\\b|agreement|\\bsigns?\\b|expan|export",
+ "korea_exclude": "Galaxy|smartphone|\\bphones?\\b|\\bTVs?\\b|\\btelevision|OLED|QLED|fridge|washing machine|\\breview\\b|test drive|price and specs|\\bspecs\\b|\\bEV\\d\\b|\\bSUV\\b|\\bute\\b|\\bsale\\b|discount|K-?pop|drama|baseball|golf|tennis"
 }

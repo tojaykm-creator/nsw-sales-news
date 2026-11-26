@@ -30,6 +30,14 @@ def relevant(title, source_url):
     return bool(re.search(R["topic"], text, re.I)
                 and (re.search(R["place"], title, re.I) or host.endswith(".au")))
 
+def korean(title, source_url):
+    """Korean company AND business news AND Australian title or publisher."""
+    host = urllib.parse.urlparse(source_url).hostname or ""
+    return bool(re.search(R["korea_names"], title)
+                and re.search(R["korea_biz"], title, re.I)
+                and not re.search(R["korea_exclude"], title, re.I)
+                and (re.search(R["place"], title, re.I) or host.endswith(".au")))
+
 def enrich(title):
     stage = next((s[0] for s in R["stages"] if re.search(s[2], title, re.I)), "")
     m = re.search(r"A?\$\s?\d[\d,.]*\s?(billion|million|bn\b|b\b|m\b)?", title, re.I)
@@ -46,12 +54,14 @@ def parse(xml, cat):
         if not title or re.search(R["exclude"], title, re.I):
             continue
         src = it.find("source")
-        if not relevant(title, (src.get("url") or "") if src is not None else ""):
+        src_url = (src.get("url") or "") if src is not None else ""
+        is_korea = korean(title, src_url)
+        if not is_korea and (cat == "korea" or not relevant(title, src_url)):
             continue
         date = parsedate_to_datetime(it.findtext("pubDate")).astimezone(dt.timezone.utc)
         stage, amount, region = enrich(title)
         out.append(dict(title=title, ko="", url=it.findtext("link"), source=source,
-                        date=date.isoformat(), cat=classify(title, cat), stage=stage,
+                        date=date.isoformat(), cat="korea" if is_korea else classify(title, cat), stage=stage,
                         amount=amount, region=region, v=3))
     return out
 
@@ -95,7 +105,10 @@ def main():
                 continue
             print(query, "->", len(found))
             for i in found[:40]:
-                items.setdefault(i["title"].lower(), i)
+                key = i["title"].lower()
+            if i["cat"] == "korea" and key in items:
+                items[key]["cat"] = "korea"
+            items.setdefault(key, i)
     if not ok:
         raise SystemExit("All feeds failed; data.json left unchanged.")
     cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).isoformat()
