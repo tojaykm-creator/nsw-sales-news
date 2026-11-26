@@ -85,6 +85,7 @@ def main():
     ok = 0
     for c in R["cats"]:
         for query in c[3]:
+            time.sleep(8)  # space requests to avoid 503 blocking
             q = urllib.parse.quote(query + " when:30d")
             try:
                 found = parse(get(f"https://news.google.com/rss/search?q={q}&hl=en-AU&gl=AU&ceid=AU:en"), c[0])
@@ -93,7 +94,7 @@ def main():
                 print("fetch failed:", query, e)
                 continue
             print(query, "->", len(found))
-            for i in found[:25]:
+            for i in found[:40]:
                 items.setdefault(i["title"].lower(), i)
     if not ok:
         raise SystemExit("All feeds failed; data.json left unchanged.")
