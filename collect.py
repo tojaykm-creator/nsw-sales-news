@@ -24,10 +24,11 @@ def classify(title, fallback):
     return fallback
 
 def relevant(title, source_url):
-    """Logistics topic AND (Australian place in title OR Australian publisher)."""
+    """Logistics topic, and either Australian (title or publisher) or no foreign country named."""
     host = urllib.parse.urlparse(source_url).hostname or ""
     return bool(re.search(R["topic"], title, re.I)
-                and (re.search(R["place"], title, re.I) or host.endswith(".au")))
+                and (re.search(R["place"], title, re.I) or host.endswith(".au")
+                     or not re.search(R["foreign"], title)))
 
 def enrich(title):
     stage = next((s[0] for s in R["stages"] if re.search(s[2], title, re.I)), "")
@@ -83,22 +84,24 @@ def main():
     items = {i["title"].lower(): i for i in old if i.get("v") == 2}
     ok = 0
     for c in R["cats"]:
-        q = urllib.parse.quote(c[3] + " when:7d")
-        try:
-            found = parse(get(f"https://news.google.com/rss/search?q={q}&hl=en-AU&gl=AU&ceid=AU:en"), c[0])
-            ok += 1
-        except Exception as e:
-            print("fetch failed:", c[0], e)
-            continue
-        for i in found:
-            items.setdefault(i["title"].lower(), i)
+        for query in c[3]:
+            q = urllib.parse.quote(query + " when:30d")
+            try:
+                found = parse(get(f"https://news.google.com/rss/search?q={q}&hl=en-AU&gl=AU&ceid=AU:en"), c[0])
+                ok += 1
+            except Exception as e:
+                print("fetch failed:", query, e)
+                continue
+            print(query, "->", len(found))
+            for i in found[:25]:
+                items.setdefault(i["title"].lower(), i)
     if not ok:
         raise SystemExit("All feeds failed; data.json left unchanged.")
     cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).isoformat()
     rows = sorted((i for i in items.values() if i["date"] >= cutoff), key=lambda i: i["date"], reverse=True)[:500]
     done = fails = 0
     for i in rows:
-        if i["ko"] or done >= 80 or fails >= 3:
+        if i["ko"] or done >= 250 or fails >= 3:
             continue
         try:
             i["ko"] = translate(i["title"]); done += 1; fails = 0; time.sleep(0.5)
