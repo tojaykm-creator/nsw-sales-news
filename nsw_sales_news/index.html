@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NSW Sales News</title><link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#fff;--fg:#111827;--mut:#6b7280;--card:#f3f4f6;--ac:#1d4ed8;--line:#e5e7eb}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1420;--fg:#e5e7eb;--mut:#9ca3af;--card:#1b2232;--ac:#7aa2ff;--line:#2a3347}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif}
+header{position:sticky;top:0;background:var(--bg);padding:12px 16px;border-bottom:1px solid var(--line);transition:transform .2s;z-index:2}
+header.hide{transform:translateY(-100%)}main{max-width:640px;margin:0 auto;padding:12px 16px 90px}
+h1{margin:0;font-size:20px}small,.mut{color:var(--mut);font-size:12px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;margin-top:8px}
+button{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:8px;padding:6px 10px}
+button.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.grid button{font-size:11px;padding:6px 2px}
+article{background:var(--card);border-radius:12px;padding:12px;margin:10px 0}article a{color:var(--fg);font-weight:600;text-decoration:none}
+.tag{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin:0 4px 4px 0}
+.tip{color:var(--ac);font-size:13px;margin:6px 0}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--bg);border-top:1px solid var(--line);padding:6px}
+nav button{flex:1;border:0}
+</style></head><body>
+<header><h1>NSW Sales News</h1><small id="upd"></small></header><main id="m"></main><nav id="nav"></nav>
+<script>
+const CFG={"cats": [["invest", "Investment", "투자·시설", "warehouse OR \"distribution centre\" OR \"logistics hub\" construction NSW", "warehouse|distribution cent|logistics (hub|estate|park|facility)|industrial (estate|park)|invest|factory|manufactur", "New site means possible demand for warehousing and system integration.", "신규 거점은 창고 운영과 시스템 연동 수요 가능성"], ["trade", "Customs & Biosecurity", "통관·검역", "Australian Border Force OR biosecurity import changes", "customs|border force|biosecurity|tariff|quarantine|DAFF", "Check impact on customer clearance cost and lead time.", "고객 통관 비용과 리드타임 영향 확인"], ["trade_flow", "Import & Export", "수출입", "NSW OR Australia imports exports trade volumes", "\\bimports?\\b|\\bexports?\\b|trade (volume|balance|deal|agreement)", "Volume shifts may change freight demand.", "물동량 변화에 따른 운송 수요 점검"], ["logistics", "Logistics & Transport", "물류·운송", "NSW freight OR port OR 3PL OR logistics", "freight|port botany|shipping|3PL|logistics|trucking|rail|intermodal|air cargo", "Review route, capacity and rate impact.", "경로, 선복, 운임 영향 검토"], ["law", "Law & Regulation", "법령·제도", "NSW OR Australia transport warehouse regulation law changes", "regulation|legislation|\\blaw\\b|\\bact\\b|compliance|reform|heavy vehicle", "Flag compliance changes to affected customers.", "영향 고객에게 규정 변경 안내"], ["retail", "Consumer & Retail", "소비·유통", "Australia retail OR e-commerce fulfilment trends", "retail|e-?commerce|supermarket|consumer|fulfil", "Watch for fulfilment capacity needs.", "풀필먼트 수요 변화 관찰"], ["industry", "Industry Trends", "산업 동향", "Western Sydney industry development Aerotropolis", "", "Background for customer meetings.", "고객 미팅 참고 자료"]], "stages": [["Completion", "준공·개장", "completed|completion of|\\bopens\\b|\\bopened\\b|officially open"], ["Construction", "착공", "construction (has )?(start|begun|underway|commence)|begins? construction|starts? construction|breaks? ground|sod[- ]turn"], ["Approval", "인허가", "approv|green ?light|development application|\\bDA\\b"], ["Announcement", "계획·발표", "plan(s|ned)?\\b|announc|propos|\\bMOU\\b"]]},SEED=[{"title": "Charter Hall's $1b Light Horse hub fully leased as Woolworths takes new chilled DC", "ko": "Charter Hall의 10억 달러 Light Horse 허브, Woolworths 신선센터 포함 임대 100% 완료", "url": "https://primemovermag.com.au/woolworths-showcases-new-sydney-distribution-centre/", "source": "Prime Mover", "date": "2026-11-18T00:00:00+00:00", "cat": "invest", "stage": "", "amount": "$1b", "region": "Eastern Creek"}, {"title": "Woolworths unveils automated chilled and fresh DC ahead of 2027 opening", "ko": "Woolworths, 2027년 개장 예정 자동화 신선 물류센터 공개", "url": "https://www.trailermag.com.au/woolworths-showcases-new-sydney-distribution-centre", "source": "Trailer Magazine", "date": "2026-11-16T00:00:00+00:00", "cat": "invest", "stage": "Construction", "amount": "", "region": "Eastern Creek"}, {"title": "DAFF notice 195-2026: Cargo Scheduling Policy implementation update", "ko": "DAFF 공지 195-2026: 화물 스케줄링 정책 시행 업데이트", "url": "https://www.agriculture.gov.au/biosecurity-trade/import/industry-advice/2026", "source": "DAFF", "date": "2026-11-16T00:00:00+00:00", "cat": "trade", "stage": "", "amount": "", "region": ""}, {"title": "Woolworths recruiting 800 roles for Western Sydney fresh distribution centre", "ko": "Woolworths, 서부 시드니 신선 물류센터 인력 800명 채용", "url": "https://www.woolworthsgroup.com.au/au/en/our-newsroom/media-releases/latest-news/2026/800-new-jobs-created-and-even-fresher-produce-for-customers-as-Woolworths-prepares-to-open-next-generation-distribution-centre.html", "source": "Woolworths Group", "date": "2026-11-04T00:00:00+00:00", "cat": "retail", "stage": "", "amount": "", "region": "Western Sydney"}, {"title": "Aldi begins construction of $1b+ automated distribution centre at Bradfield", "ko": "Aldi, Bradfield에 10억 달러 이상 자동화 물류센터 착공 (2030년 개장 예정)", "url": "https://www.retailbiz.com.au/latest-news/aldi-1b-western-sydney-distribution-centre/", "source": "retailbiz", "date": "2026-10-01T00:00:00+00:00", "cat": "invest", "stage": "Construction", "amount": "$1b+", "region": "Bradfield"}, {"title": "$1b Burrah Park logistics and industrial estate approved in Western Sydney", "ko": "서부 시드니 10억 달러 Burrah Park 물류·산업단지 승인", "url": "https://mhdsupplychain.com.au/2026/07/16/1-billion-western-sydney-logistics-and-industrial-hub-approved/", "source": "MHD", "date": "2026-07-16T00:00:00+00:00", "cat": "invest", "stage": "Approval", "amount": "$1b", "region": "Western Sydney"}, {"title": "DAFF: revised biosecurity diagnostic fees for imported cargo planned from 1 November 2026", "ko": "DAFF: 수입화물 검역 진단 수수료 개편, 2026년 11월 1일 시행 예정으로 공지", "url": "https://www.agriculture.gov.au/biosecurity-trade/import/industry-advice/2026/93-2026", "source": "DAFF 93-2026", "date": "2026-06-16T00:00:00+00:00", "cat": "trade", "stage": "Announcement", "amount": "", "region": ""}];
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let lang=store.get("lang","en"),saved=store.get("saved",{}),items=SEED,sample=true,updated="",tab="today",cat="",stage="",q="",shown=60,stFilter="";
+const L=(en,ko)=>lang==="ko"?ko:en;
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safe=u=>/^https?:\/\//.test(u)?u:"#";
+const day=d=>new Date(d).toLocaleDateString("en-AU",{day:"2-digit",month:"short",year:"numeric",timeZone:"Australia/Sydney"});
+const catOf=id=>CFG.cats.find(c=>c[0]===id)||CFG.cats[6];
+const stName=s=>{const x=CFG.stages.find(v=>v[0]===s);return x?L(x[0],x[1]):""};
+const STAT=[["check","To check","확인 필요"],["doing","In progress","진행 중"],["done","Done","완료"]];
+function card(i,n){const s=saved[i.url],c=catOf(i.cat);
+return `<article><div class="mut">${n?n+". ":""}${esc(L(c[1],c[2]))} · ${esc(i.source)} · ${day(i.date)}</div>
+<a href="${esc(safe(i.url))}" target="_blank" rel="noopener">${esc(L(i.title,i.ko||i.title))}</a><div>${[stName(i.stage),i.amount,i.region].filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+<div class="tip">${esc(L(c[5],c[6]))}</div><button data-save="${esc(i.url)}" class="${s?"on":""}">${s?L("Saved","저장됨"):L("Save","저장")}</button></article>`}
+const sorted=()=>[...items].sort((a,b)=>b.date.localeCompare(a.date));
+const match=i=>(!cat||i.cat===cat)&&(!q||[i.title,i.ko,i.region,i.source].join(" ").toLowerCase().includes(q.toLowerCase()));
+function list(){const all=sorted().filter(match);return all.slice(0,shown).map(i=>card(i)).join("")||`<p class="mut">${L("No news found.","해당 뉴스가 없습니다.")}</p>`}
+function render(){
+ document.getElementById("upd").textContent=sample?L("Sample: articles found 26 Nov 2026. Not live.","샘플: 2026-11-26 검색 기사. 자동 수집 아님."):L("Updated ","갱신 ")+new Date(updated).toLocaleString("en-AU",{timeZone:"Australia/Sydney"});
+ let h="";
+ if(tab==="today"){
+  const rank=i=>(i.stage?2:0)+(i.amount?1:0)+(i.region?1:0);
+  const week=sorted().filter(i=>Date.now()-new Date(i.date)<14*864e5);
+  const top=(week.length>=3?week:sorted()).slice().sort((a,b)=>rank(b)-rank(a)||b.date.localeCompare(a.date)).slice(0,3);
+  h=`<input id="q" placeholder="${L("Search company, region, topic","회사, 지역, 주제 검색")}" value="${esc(q)}">
+  <div class="grid">${[["",L("All","전체")],...CFG.cats.map(c=>[c[0],L(c[1],c[2])])].map(c=>`<button data-cat="${c[0]}" class="${cat===c[0]?"on":""}">${esc(c[1])}</button>`).join("")}</div>
+  ${!cat&&!q?`<h3>${L("Top 3 sales signals","핵심 영업 신호 3건")}</h3>${top.map((i,n)=>card(i,n+1)).join("")}<h3>${L("Latest","최신")}</h3>`:""}<div id="list">${list()}</div>`;
+ }else if(tab==="leads"){
+  const all=sorted().filter(i=>i.stage&&(!stage||i.stage===stage));
+  h=`<div class="grid">${CFG.stages.map(s=>`<button data-stage="${s[0]}" class="${stage===s[0]?"on":""}">${esc(L(s[0],s[1]))} ${items.filter(i=>i.stage===s[0]).length}</button>`).join("")}</div>${all.map(i=>card(i)).join("")}`;
+ }else if(tab==="saved"){
+  const rows=Object.values(saved).filter(s=>!stFilter||s.status===stFilter);
+  h=`<div class="grid">${[["","All","전체"],...STAT].map(s=>`<button data-st="${s[0]}" class="${stFilter===s[0]?"on":""}">${L(s[1],s[2])}</button>`).join("")}</div>
+  <p class="mut">${L("Notes stay in this browser only.","메모는 이 브라우저에만 저장됩니다.")}</p>${rows.map(s=>card(s.item)+`<select data-status="${esc(s.item.url)}">${STAT.map(x=>`<option value="${x[0]}" ${s.status===x[0]?"selected":""}>${L(x[1],x[2])}</option>`).join("")}</select><textarea data-memo="${esc(s.item.url)}" placeholder="${L("Memo","메모")}">${esc(s.memo)}</textarea>`).join("")}
+  <button id="csv">${L("Export CSV","엑셀용 CSV 내보내기")}</button> <textarea id="out" hidden rows="6"></textarea>`;
+ }else{
+  h=`<h3>${L("Language","언어")}</h3><button data-lang="en" class="${lang==="en"?"on":""}">English</button> <button data-lang="ko" class="${lang==="ko"?"on":""}">한국어</button>`;
+ }
+ document.getElementById("m").innerHTML=h;
+ document.getElementById("nav").innerHTML=[["today","Today","오늘"],["leads","Leads","리드"],["saved","Saved","저장"],["set","Settings","설정"]].map(t=>`<button data-tab="${t[0]}" class="${tab===t[0]?"on":""}">${L(t[1],t[2])}</button>`).join("");
+}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+ if(d.tab){tab=d.tab;scrollTo(0,0)}else if("cat" in d){cat=d.cat;shown=60}else if(d.stage){stage=stage===d.stage?"":d.stage}else if("st" in d){stFilter=d.st}
+ else if(d.lang){lang=d.lang;store.set("lang",lang)}
+ else if(d.save){if(saved[d.save])delete saved[d.save];else{const item=items.find(i=>i.url===d.save);if(item)saved[d.save]={item,status:"check",memo:""}}store.set("saved",saved)}
+ else if(b.id==="csv"){const cell=v=>{v=String(v||"");if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};
+  const text=[["Date","Title","Source","Status","Memo","URL"],...Object.values(saved).map(s=>[s.item.date.slice(0,10),s.item.title,s.item.source,s.status,s.memo,s.item.url])].map(r=>r.map(cell).join(",")).join("\n");
+  const o=document.getElementById("out");o.hidden=false;o.value=text;
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+text],{type:"text/csv"}));a.download="saved_leads.csv";a.click()}catch(x){}return}
+ else return;
+ render()});
+document.addEventListener("input",e=>{const t=e.target,d=t.dataset;
+ if(t.id==="q"){q=t.value;shown=60;const p=t.selectionStart;render();const n=document.getElementById("q");n.focus();n.setSelectionRange(p,p)}
+ if(d.memo){saved[d.memo].memo=t.value;store.set("saved",saved)}
+ if(d.status){saved[d.status].status=t.value;store.set("saved",saved)}});
+let last=0;addEventListener("scroll",()=>{const y=scrollY;document.querySelector("header").classList.toggle("hide",y>last&&y>60);last=y;
+ if(tab==="today"&&innerHeight+y>document.body.scrollHeight-200&&shown<items.length){shown+=60;document.getElementById("list").innerHTML=list()}});
+render();
+fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.items&&j.items.length){items=j.items;updated=j.updated;sample=false;render()}}).catch(()=>{});
+</script></body></html>
