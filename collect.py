@@ -24,11 +24,11 @@ def classify(title, fallback):
     return fallback
 
 def relevant(title, source_url):
-    """Logistics topic, and either Australian (title or publisher) or no foreign country named."""
+    """Logistics topic (brand names ignored) AND Australian title or publisher."""
     host = urllib.parse.urlparse(source_url).hostname or ""
-    return bool(re.search(R["topic"], title, re.I)
-                and (re.search(R["place"], title, re.I) or host.endswith(".au")
-                     or not re.search(R["foreign"], title)))
+    text = re.sub(R["brands"], "", title, flags=re.I)
+    return bool(re.search(R["topic"], text, re.I)
+                and (re.search(R["place"], title, re.I) or host.endswith(".au")))
 
 def enrich(title):
     stage = next((s[0] for s in R["stages"] if re.search(s[2], title, re.I)), "")
@@ -52,7 +52,7 @@ def parse(xml, cat):
         stage, amount, region = enrich(title)
         out.append(dict(title=title, ko="", url=it.findtext("link"), source=source,
                         date=date.isoformat(), cat=classify(title, cat), stage=stage,
-                        amount=amount, region=region, v=2))
+                        amount=amount, region=region, v=3))
     return out
 
 def mymemory(text):
@@ -81,7 +81,7 @@ def translate(text):
 
 def main():
     old = json.loads(DATA.read_text(encoding="utf-8"))["items"] if DATA.exists() else []
-    items = {i["title"].lower(): i for i in old if i.get("v") == 2}
+    items = {i["title"].lower(): i for i in old if i.get("v") == 3}
     ok = 0
     for c in R["cats"]:
         for query in c[3]:

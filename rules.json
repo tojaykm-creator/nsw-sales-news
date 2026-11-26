@@ -132,8 +132,9 @@
   "Tasmania",
   "Fremantle"
  ],
- "exclude": "share price|ASX 200|stock market|horoscope|real estate auction|obituar|\\(ASX:|News and Statistics|police|charged|drug|\\bSUV\\b|\\bute\\b",
+ "exclude": "share price|ASX 200|stock market|horoscope|real estate auction|obituar|\\(ASX:|News and Statistics|police|charged|drug|\\bSUV\\b|\\bute\\b|festival|concert|\\bDJ\\b|luggage|travell?er|passenger bag|charity|mental health|weight.loss|sacking|unfair dismissal|recipe|worms|cocaine|smuggl",
  "topic": "warehous|distribution (cent|hub)|logistics|freight|supply chain|port (botany|kembla|of (newcastle|sydney))|shipping|cargo|intermodal|customs|biosecurity|border force|tariffs?\\b|\\bimports?\\b|\\bexports?\\b|\\b3PL\\b|fulfil|heavy vehicle|truck(ing| driver)|industrial (estate|park|land|precinct)|e-?commerce",
  "place": "\\bAustralia|\\bAussie|\\bNSW\\b|New South Wales|Sydney|Newcastle|Wollongong|Port Botany|Port Kembla|Moorebank|Eastern Creek|Kemps Creek|Bradfield|Badgerys Creek|Aerotropolis|Erskine Park|Marsden Park|Yennora|Melbourne|Brisbane|Perth|Adelaide|Darwin|Hobart|Canberra|Geelong|Victoria|Queensland|Western Australia|South Australia|Tasmania|Northern Territory|Fremantle",
- "foreign": "\\b(China|Chinese|India|Indian|US|U\\.S\\.|America|UK|Britain|Europe|EU|Africa|Botswana|Cambodia|Thailand|Vietnam|T[uü]rkiye|Turkey|Pakistan|Nigeria|Kenya|Philippines|Indonesia|Malaysia|Japan|Korea|Canada|Mexico|Russia|Ukraine|Iran|Saudi|Dubai|Bangladesh|Sri Lanka|New Zealand)\\b"
+ "foreign": "\\b(China|Chinese|India|Indian|US|U\\.S\\.|America|UK|Britain|Europe|EU|Africa|Botswana|Cambodia|Thailand|Vietnam|T[uü]rkiye|Turkey|Pakistan|Nigeria|Kenya|Philippines|Indonesia|Malaysia|Japan|Korea|Canada|Mexico|Russia|Ukraine|Iran|Saudi|Dubai|Bangladesh|Sri Lanka|New Zealand)\\b",
+ "brands": "Chemist Warehouse|(The )?Warehouse (Project|Group)|Sneaker Warehouse|Dan Murphy'?s"
 }
