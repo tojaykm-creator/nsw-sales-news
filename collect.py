@@ -23,6 +23,12 @@ def classify(title, fallback):
             return c[0]
     return fallback
 
+def relevant(title, source_url):
+    """Logistics topic AND (Australian place in title OR Australian publisher)."""
+    host = urllib.parse.urlparse(source_url).hostname or ""
+    return bool(re.search(R["topic"], title, re.I)
+                and (re.search(R["place"], title, re.I) or host.endswith(".au")))
+
 def enrich(title):
     stage = next((s[0] for s in R["stages"] if re.search(s[2], title, re.I)), "")
     m = re.search(r"A?\$\s?\d[\d,.]*\s?(billion|million|bn\b|b\b|m\b)?", title, re.I)
@@ -38,23 +44,43 @@ def parse(xml, cat):
             title = title[: -len(source) - 3]
         if not title or re.search(R["exclude"], title, re.I):
             continue
+        src = it.find("source")
+        if not relevant(title, (src.get("url") or "") if src is not None else ""):
+            continue
         date = parsedate_to_datetime(it.findtext("pubDate")).astimezone(dt.timezone.utc)
         stage, amount, region = enrich(title)
         out.append(dict(title=title, ko="", url=it.findtext("link"), source=source,
                         date=date.isoformat(), cat=classify(title, cat), stage=stage,
-                        amount=amount, region=region))
+                        amount=amount, region=region, v=2))
     return out
 
-def translate(text):
+def mymemory(text):
     q = urllib.parse.urlencode({"q": text[:480], "langpair": "en|ko"})
     j = json.loads(get("https://api.mymemory.translated.net/get?" + q))
     if str(j.get("responseStatus")) != "200":
-        raise RuntimeError("translation limit or error")
+        raise RuntimeError(f"{j.get('responseStatus')} {j.get('responseDetails')}")
     return html.unescape(j["responseData"]["translatedText"])
+
+def google(text):
+    # unofficial free endpoint; may stop working without notice
+    q = urllib.parse.urlencode({"client": "gtx", "sl": "en", "tl": "ko", "dt": "t", "q": text[:480]})
+    j = json.loads(get("https://translate.googleapis.com/translate_a/single?" + q))
+    return "".join(part[0] for part in j[0] if part[0])
+
+def translate(text):
+    for fn in (mymemory, google):
+        try:
+            out = fn(text)
+            if re.search("[가-힣]", out):
+                return out
+            print(fn.__name__, "returned no Korean")
+        except Exception as e:
+            print(fn.__name__, "failed:", e)
+    raise RuntimeError("all translators failed")
 
 def main():
     old = json.loads(DATA.read_text(encoding="utf-8"))["items"] if DATA.exists() else []
-    items = {i["title"].lower(): i for i in old}
+    items = {i["title"].lower(): i for i in old if i.get("v") == 2}
     ok = 0
     for c in R["cats"]:
         q = urllib.parse.quote(c[3] + " when:7d")
@@ -70,14 +96,14 @@ def main():
         raise SystemExit("All feeds failed; data.json left unchanged.")
     cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).isoformat()
     rows = sorted((i for i in items.values() if i["date"] >= cutoff), key=lambda i: i["date"], reverse=True)[:500]
-    done = 0
+    done = fails = 0
     for i in rows:
-        if i["ko"] or done >= 60:
+        if i["ko"] or done >= 80 or fails >= 3:
             continue
         try:
-            i["ko"] = translate(i["title"]); done += 1; time.sleep(0.5)
+            i["ko"] = translate(i["title"]); done += 1; fails = 0; time.sleep(0.5)
         except Exception as e:
-            print("translation stopped:", e); break
+            fails += 1; print("translation failed:", e)
     DATA.write_text(json.dumps({"updated": dt.datetime.now(dt.timezone.utc).isoformat(), "items": rows},
                                ensure_ascii=False, indent=1), encoding="utf-8")
     print(len(rows), "items,", done, "translated")
